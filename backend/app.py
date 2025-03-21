@@ -1,8 +1,7 @@
 from flask import Flask, request, jsonify
-from database import session, CubeSat
+from models import session, CubeSat, Image, Classification
 from celery_worker import process_image
 import os
-from models import Image, Classification
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cubesat.db'
