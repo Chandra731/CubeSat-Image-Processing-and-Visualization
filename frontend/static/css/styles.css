@@ -1,0 +1,34 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+#earth-viewer {
+    height: 500px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+#image-display, #capture-form, #history-display {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.list-group-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.list-group-item img {
+    width: 100px;
+    height: auto;
+    margin-right: 10px;
+}

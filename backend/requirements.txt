@@ -1,0 +1,8 @@
+Flask
+SQLAlchemy
+requests
+python-dotenv
+pyorbital
+google-api-python-client
+earthengine-api
+celery
