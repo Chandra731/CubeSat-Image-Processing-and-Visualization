@@ -1,28 +1,14 @@
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
-from sqlalchemy.orm import registry, sessionmaker
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import os
 
-# Database setup
-engine = create_engine('sqlite:///cubesat.db', echo=True)
-metadata = MetaData()
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///database.db")  # Default SQLite
 
-# Define cubesat_positions table
-cubesat_positions = Table(
-    'cubesat_positions', metadata,
-    Column('id', Integer, primary_key=True),
-    Column('satellite', String),
-    Column('line1', String),
-    Column('line2', String)
-)
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
 
-# Create a registry and map the CubeSat class
-mapper_registry = registry()
-
-@mapper_registry.mapped
-class CubeSat:
-    __table__ = cubesat_positions
-
-metadata.create_all(engine)
-
-# Create a new session
-Session = sessionmaker(bind=engine)
-session = Session()
+def init_db():
+    from models import CubeSat, ImageHistory, Classification
+    Base.metadata.create_all(bind=engine)

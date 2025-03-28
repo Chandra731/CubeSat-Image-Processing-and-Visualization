@@ -1,29 +1,33 @@
 import requests
-from models import session, CubeSat
+from sqlalchemy.orm import sessionmaker
+from database import engine
+from models import CubeSat
+
+TLE_URL = "https://celestrak.org/NORAD/elements/gp.php?GROUP=cubesat&FORMAT=tle"
+
+Session = sessionmaker(bind=engine)
+session = Session()
 
 def fetch_tle_data():
-    url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=cubesat&FORMAT=tle"
-    print("Fetching TLE data from:", url)  
-    response = requests.get(url)
-    tle_data = response.text
-    print("Fetched TLE data successfully.")  
+    response = requests.get(TLE_URL)
+    if response.status_code == 200:
+        tle_data = response.text.split("\n")
+        for i in range(0, len(tle_data) - 2, 3):
+            satellite = tle_data[i].strip()
+            line1 = tle_data[i + 1].strip()
+            line2 = tle_data[i + 2].strip()
 
-    print("Clearing existing CubeSat data from the database...")  
-    session.query(CubeSat).delete()
-    session.commit()
-    print("Cleared existing CubeSat data.")  
+            existing = session.query(CubeSat).filter_by(satellite=satellite).first()
+            if existing:
+                existing.line1 = line1
+                existing.line2 = line2
+            else:
+                new_satellite = CubeSat(satellite=satellite, line1=line1, line2=line2)
+                session.add(new_satellite)
 
-    lines = tle_data.strip().split("\n")
-    for i in range(0, len(lines), 3):
-        satellite = lines[i].strip()
-        line1 = lines[i + 1].strip()
-        line2 = lines[i + 2].strip()
-        print(f"Storing CubeSat: {satellite}")  
-        new_entry = CubeSat(satellite=satellite, line1=line1, line2=line2)
-        session.add(new_entry)
-
-    session.commit()
-    print("TLE data fetched and stored successfully.") 
+        session.commit()
+    else:
+        print("Failed to fetch TLE data")
 
 if __name__ == "__main__":
     fetch_tle_data()

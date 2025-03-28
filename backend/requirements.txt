@@ -2,7 +2,8 @@ Flask
 SQLAlchemy
 requests
 python-dotenv
-pyorbital
-google-api-python-client
+google-auth
+google-auth-oauthlib
 earthengine-api
 celery
+redis
