@@ -1,16 +1,44 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const historyContainer = document.createElement('div');
-    historyContainer.id = 'image-history-container';
-    historyContainer.style.position = 'absolute';
-    historyContainer.style.top = '10px';
-    historyContainer.style.right = '10px';
-    historyContainer.style.background = 'rgba(0, 0, 0, 0.7)';
-    historyContainer.style.color = 'white';
-    historyContainer.style.padding = '10px';
-    historyContainer.style.display = 'none';
-    document.body.appendChild(historyContainer);
+export function setupUIInteractions(viewer, captureImage, fetchImageHistory) {
+    // Handle mouse move to update lat/lon input fields
+    viewer.screenSpaceEventHandler.setInputAction((movement) => {
+        const cartesian = viewer.camera.pickEllipsoid(movement.endPosition, viewer.scene.globe.ellipsoid);
+        if (cartesian) {
+            const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+            const latitude = Cesium.Math.toDegrees(cartographic.latitude).toFixed(6);
+            const longitude = Cesium.Math.toDegrees(cartographic.longitude).toFixed(6);
+            document.getElementById("latitude").value = latitude;
+            document.getElementById("longitude").value = longitude;
+            document.getElementById('latitude-display').innerText = latitude;
+            document.getElementById('longitude-display').innerText = longitude;
+        }
+    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
-    document.getElementById('imageHistory').addEventListener('click', () => {
-        historyContainer.style.display = historyContainer.style.display === 'none' ? 'block' : 'none';
+    // Capture Image button click
+    document.getElementById("capture-btn").addEventListener("click", function () {
+        const lat = document.getElementById("latitude").value;
+        const lon = document.getElementById("longitude").value;
+        captureImage(lat, lon);
     });
-});
+
+    // Image History button click
+    document.getElementById("image-history-btn").addEventListener("click", function () {
+        fetchImageHistory();
+    });
+}
+
+function displayCapturedImage(imageUrl) {
+    const imageDisplay = document.getElementById('image-display');
+    imageDisplay.innerHTML = `<img src="${imageUrl}" alt="Captured Image" class="img-thumbnail">`;
+}
+
+function displayImageHistory(data) {
+    const historyContent = document.getElementById('image-history-content');
+    historyContent.innerHTML = '';
+    data.forEach(image => {
+        const imageElement = document.createElement('div');
+        imageElement.className = 'p-2';
+        imageElement.innerHTML = `<img src="${image.image_url}" alt="Satellite Image" class="img-thumbnail">`;
+        historyContent.appendChild(imageElement);
+    });
+    $('#image-history-modal').modal('show');
+}

@@ -1,0 +1,3 @@
+[console_scripts]
+fetch_tles = pyorbital.fetch_tles:run
+fetch_tles.py = pyorbital.fetch_tles:run

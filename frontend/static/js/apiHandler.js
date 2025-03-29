@@ -1,26 +1,83 @@
-document.getElementById('capture').addEventListener('click', async () => {
-    const latitude = document.getElementById('latitude').value;
-    const longitude = document.getElementById('longitude').value;
+export async function fetchCubeSatData(viewer) {
+    try {
+        const response = await fetch('http://127.0.0.1:5001/api/cubesat_positions');
+        const data = await response.json();
 
-    const response = await fetch('/api/capture_image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ latitude, longitude })
-    });
+        // Validate data
+        if (!Array.isArray(data)) {
+            throw new Error('Invalid data format: Expected an array');
+        }
 
-    const result = await response.json();
-    alert(`Image Captured! URL: ${result.image_url}`);
-});
+        data.forEach(sat => {
+            if (typeof sat.lat !== 'number' || typeof sat.lon !== 'number' || typeof sat.alt !== 'number') {
+                throw new Error('Invalid data format: Expected latitude, longitude, and altitude to be numbers');
+            }
 
-document.getElementById('imageHistory').addEventListener('click', async () => {
-    const response = await fetch('/api/image_history');
-    const images = await response.json();
+            const position = Cesium.Cartesian3.fromDegrees(sat.lon, sat.lat, sat.alt * 1000);
+            viewer.entities.add({
+                position: position,
+                point: { pixelSize: 8, color: Cesium.Color.RED },
+                label: {
+                    text: sat.satellite,
+                    font: '14px sans-serif',
+                    fillColor: Cesium.Color.WHITE,
+                    showBackground: true
+                },
+                path: {
+                    show: true,
+                    leadTime: 0,
+                    trailTime: 60 * 60 * 24, // 24 hours trail
+                    width: 2,
+                    resolution: 120,
+                    material: new Cesium.PolylineGlowMaterialProperty({
+                        glowPower: 0.16,
+                        color: Cesium.Color.BLUE
+                    })
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Error fetching CubeSat data:', error);
+    }
+}
 
-    let historyHTML = '<h3>Image History</h3><ul>';
-    images.forEach(img => {
-        historyHTML += `<li><a href="${img.image_url}" target="_blank">${img.timestamp}</a></li>`;
-    });
-    historyHTML += '</ul>';
+export async function captureImage(latitude, longitude) {
+    try {
+        const response = await fetch('http://127.0.0.1:5001/api/capture_image', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ latitude, longitude }),
+        });
+        const data = await response.json();
+        displayCapturedImage(data.image_url);
+        storeImageInDatabase(data.image_url, latitude, longitude);
+    } catch (error) {
+        console.error('Error capturing image:', error);
+    }
+}
 
-    document.getElementById('image-history-container').innerHTML = historyHTML;
-});
+export async function fetchImageHistory() {
+    try {
+        const response = await fetch('http://127.0.0.1:5001/api/image_history');
+        const data = await response.json();
+        displayImageHistory(data);
+    } catch (error) {
+        console.error('Error fetching image history:', error);
+    }
+}
+
+async function storeImageInDatabase(imageUrl, latitude, longitude) {
+    try {
+        await fetch('http://127.0.0.1:5001/api/store_image', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ imageUrl, latitude, longitude }),
+        });
+    } catch (error) {
+        console.error('Error storing image in database:', error);
+    }
+}

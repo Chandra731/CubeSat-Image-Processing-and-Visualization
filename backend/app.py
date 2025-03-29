@@ -3,9 +3,11 @@ from database import init_db
 from routes.cubesat import cubesat_bp
 from routes.image import image_bp
 from routes.classify import classify_bp
+from flask_cors import CORS  
 
 app = Flask(__name__)
 
+CORS(app) 
 # Initialize database
 init_db()
 

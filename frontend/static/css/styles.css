@@ -1,33 +1,46 @@
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: black;
-    color: white;
+    background-color: #f8f9fa;
+    font-family: 'Roboto', sans-serif;
 }
+
 #cesiumContainer {
-    width: 100vw;
-    height: 100vh;
+    height: 600px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-#controls {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 10px;
-    border-radius: 5px;
+
+.form-control {
+    border-radius: 20px;
 }
-input {
-    margin: 5px;
-    padding: 5px;
+
+.btn {
+    border-radius: 20px;
 }
-button {
-    margin: 5px;
-    padding: 8px;
-    background: #007BFF;
-    color: white;
-    border: none;
-    cursor: pointer;
+
+#image-display img, .img-thumbnail {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-button:hover {
-    background: #0056b3;
+
+#history-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.position-fixed {
+    z-index: 1000;
+}
+
+.logo {
+    width: 150px;
+    height: auto;
 }

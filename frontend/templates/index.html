@@ -4,21 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CubeSat Visualization</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.91/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.83/Build/Cesium/Widgets/widgets.css">
 </head>
 <body>
-    <div id="cesiumContainer"></div>
-
-    <div id="controls">
-        <label>Latitude: <input type="text" id="latitude" readonly></label>
-        <label>Longitude: <input type="text" id="longitude" readonly></label>
-        <button id="capture">Capture Image</button>
-        <button id="imageHistory">Image History</button>
+    <div class="container">
+        <div class="text-center my-5">
+            <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="App Logo" class="logo">
+            <h1>CubeSat Data Processing & Visualization</h1>
+        </div>
+        <div id="cesiumContainer" class="mb-5"></div>
+        <div id="latLonDisplay" class="text-center mb-3">
+            <p>Latitude: <span id="latitude-display">0</span> | Longitude: <span id="longitude-display">0</span></p>
+        </div>
+        <div id="capture-form" class="mb-5">
+            <h3>Capture Image</h3>
+            <form>
+                <div class="form-group">
+                    <label for="latitude">Latitude</label>
+                    <input type="text" class="form-control" id="latitude" placeholder="Enter latitude">
+                </div>
+                <div class="form-group">
+                    <label for="longitude">Longitude</label>
+                    <input type="text" class="form-control" id="longitude" placeholder="Enter longitude">
+                </div>
+                <button type="button" class="btn btn-primary mt-3" id="capture-btn">Capture Image</button>
+            </form>
+        </div>
+        <div id="image-display" class="mb-5"></div>
+        <div id="history-display" class="mb-5">
+            <h3>Classification History</h3>
+            <ul id="history-list" class="list-group"></ul>
+        </div>
+        <button id="image-history-btn" class="btn btn-secondary position-fixed top-0 end-0 m-3">Image History</button>
+        <div id="image-history-modal" class="modal fade" tabindex="-1" aria-labelledby="image-history-modal-label" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="image-history-modal-label">Image History</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="image-history-content" class="d-flex flex-wrap"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <script src="{{ url_for('static', filename='cesiumSetup.js') }}"></script>
-    <script src="{{ url_for('static', filename='apiHandler.js') }}"></script>
-    <script src="{{ url_for('static', filename='uiHandler.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.83/Build/Cesium/Cesium.js"></script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/apiHandler.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/uiHandler.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/cesiumSetup.js') }}"></script>
 </body>
 </html>

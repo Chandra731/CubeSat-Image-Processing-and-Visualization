@@ -7,3 +7,5 @@ google-auth-oauthlib
 earthengine-api
 celery
 redis
+flask_cors
+sgp4

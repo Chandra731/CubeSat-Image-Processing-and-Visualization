@@ -1,0 +1,26 @@
+{
+    "manifest_version": 2,
+    "name": "CubeSat Visualization",
+    "version": "1.0",
+    "description": "Visualize CubeSat data and capture images.",
+    "permissions": [
+        "activeTab",
+        "http://127.0.0.1:5001/"
+    ],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["contentScript.bundle.js"],
+            "css": ["styles.css"]
+        }
+    ],
+    "web_accessible_resources": [
+        "src/assets/styles.css",
+        "src/assets/locales/en/translation.json",
+        "src/assets/locales/*/translation.json"
+    ]
+}
