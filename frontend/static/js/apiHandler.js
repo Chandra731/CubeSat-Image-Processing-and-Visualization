@@ -1,16 +1,30 @@
+const BASE_URL = 'http://127.0.0.1:5001/api';
+
+/**
+ * Fetch CubeSat positional data and update the Cesium viewer.
+ */
 export async function fetchCubeSatData(viewer) {
     try {
-        const response = await fetch('http://127.0.0.1:5001/api/cubesat_positions');
+        const response = await fetch(`${BASE_URL}/cubesat_positions`);
         const data = await response.json();
 
-        // Validate data
+        console.log("🚀 Received API Data:", data); // ✅ Log raw API response
+
         if (!Array.isArray(data)) {
             throw new Error('Invalid data format: Expected an array');
         }
 
         data.forEach(sat => {
-            if (typeof sat.lat !== 'number' || typeof sat.lon !== 'number' || typeof sat.alt !== 'number') {
-                throw new Error('Invalid data format: Expected latitude, longitude, and altitude to be numbers');
+            console.log("📡 Processing satellite:", sat); // ✅ Log each satellite entry
+
+            if (sat.lat === undefined || sat.lon === undefined || sat.alt === undefined) {
+                console.error('⚠️ Missing required fields:', sat);
+                return;
+            }
+
+            if (isNaN(sat.lat) || isNaN(sat.lon) || isNaN(sat.alt)) {
+                console.error('⚠️ Invalid number values:', sat);
+                return;
             }
 
             const position = Cesium.Cartesian3.fromDegrees(sat.lon, sat.lat, sat.alt * 1000);
@@ -37,47 +51,76 @@ export async function fetchCubeSatData(viewer) {
             });
         });
     } catch (error) {
-        console.error('Error fetching CubeSat data:', error);
+        console.error('❌ Error fetching CubeSat data:', error);
     }
 }
 
+/**
+ * Capture an image using CubeSat coordinates from Google Earth Engine.
+ */
 export async function captureImage(latitude, longitude) {
     try {
-        const response = await fetch('http://127.0.0.1:5001/api/capture_image', {
+        const response = await fetch(`${BASE_URL}/capture_image`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ latitude, longitude }),
         });
+
         const data = await response.json();
+        console.log("📸 Capture Response:", data);
+
+        if (!data.image_url) {
+            throw new Error("🚨 No image URL received from API!");
+        }
+
+        // Display image immediately
         displayCapturedImage(data.image_url);
-        storeImageInDatabase(data.image_url, latitude, longitude);
+
+        // Store image in the database
+        await storeImageInDatabase(data.image_url, latitude, longitude);
     } catch (error) {
-        console.error('Error capturing image:', error);
+        console.error('❌ Error capturing image:', error);
     }
 }
 
+/**
+ * Fetch and display stored image history.
+ */
 export async function fetchImageHistory() {
     try {
-        const response = await fetch('http://127.0.0.1:5001/api/image_history');
+        const response = await fetch(`${BASE_URL}/image_history`);
         const data = await response.json();
+
+        console.log("🖼️ Image History Data:", data);
+
+        if (!Array.isArray(data)) {
+            throw new Error("Invalid image history format. Expected an array.");
+        }
+
+        if (data.length === 0) {
+            console.warn("⚠️ No images found in history.");
+        }
+
         displayImageHistory(data);
     } catch (error) {
-        console.error('Error fetching image history:', error);
+        console.error('❌ Error fetching image history:', error);
     }
 }
 
+/**
+ * Store the captured image URL in the database.
+ */
 async function storeImageInDatabase(imageUrl, latitude, longitude) {
     try {
-        await fetch('http://127.0.0.1:5001/api/store_image', {
+        const response = await fetch(`${BASE_URL}/store_image`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ imageUrl, latitude, longitude }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ imageUrl, latitude, longitude }), // ✅ Fixed key names
         });
+
+        const result = await response.json();
+        console.log("✅ Image stored successfully:", result);
     } catch (error) {
-        console.error('Error storing image in database:', error);
+        console.error('❌ Error storing image in database:', error);
     }
 }
