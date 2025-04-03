@@ -1,3 +1,4 @@
+from importlib.abc import Loader
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import sessionmaker
 from database import engine
@@ -5,6 +6,14 @@ from models import CubeSat, ImageHistory, Classification
 from datetime import datetime
 import ee
 import random
+from sgp4.api import Satrec
+from sgp4.ext import jday
+from datetime import datetime, timedelta
+from math import degrees
+from pyproj import Geod
+import traceback
+import numpy as np
+from skyfield.api import Loader, EarthSatellite
 
 cubesat_bp = Blueprint('cubesat', __name__)
 Session = sessionmaker(bind=engine)
@@ -15,6 +24,70 @@ try:
     print(" Google Earth Engine initialized successfully!")
 except Exception as e:
     print(" GEE Initialization Failed:", str(e))
+
+
+load = Loader('skyfield_data')  # Required for Earth model
+
+def compute_orbit(tle1, tle2, duration_days=1, interval_minutes=10):
+    try:
+        satellite = Satrec.twoline2rv(tle1, tle2)
+        now = datetime.utcnow()
+        orbit_data = []
+
+        ts = load.timescale()
+        earth = load('de421.bsp')['earth']
+
+        for minute in range(0, duration_days * 24 * 60, interval_minutes):
+            time = now + timedelta(minutes=minute)
+            jd_full = jday(time.year, time.month, time.day, time.hour, time.minute, time.second)
+            jd, fr = np.divmod(jd_full, 1)
+
+            e, r, v = satellite.sgp4(jd, fr)
+
+            if e == 0:  # ✅ Only process valid data
+                satellite_skyfield = EarthSatellite(tle1, tle2, 'Cubesat', ts)
+                geocentric = satellite_skyfield.at(ts.utc(time.year, time.month, time.day, 
+                                                           time.hour, time.minute, time.second))
+                subpoint = geocentric.subpoint()
+
+                orbit_data.append({
+                    'timestamp': time.isoformat(),
+                    'lat': subpoint.latitude.degrees,
+                    'lon': subpoint.longitude.degrees,
+                    'alt': subpoint.elevation.km  # ✅ Corrected altitude in km
+                })
+            else:
+                print(f"⚠️ SGP4 Error: {e} at {time}")  # ✅ Debugging: Print error code
+
+        return orbit_data
+
+    except Exception as e:
+        print("❌ Error in compute_orbit:", str(e))
+        return []  # Return empty list on failure
+
+@cubesat_bp.route('/cubesat_orbits', methods=['GET'])
+def get_cubesat_orbits():
+    session = Session()
+    try:
+        results = session.query(CubeSat).all()
+        orbits = []
+        for row in results:
+            orbit = compute_orbit(row.line1, row.line2)
+            orbits.append({
+                'satellite': row.satellite,
+                'orbit': orbit
+            })
+
+        print("Orbits data:", orbits)  # Debugging: Print the orbits data
+        return jsonify(orbits)
+    
+    except Exception as e:
+        print("Error:", str(e))  # Print error message
+        traceback.print_exc()  # Print full error traceback
+        return jsonify({"error": str(e)}), 500
+    
+    finally:
+        session.close()
 
 
 def get_satellite_image_url(latitude=None, longitude=None):
