@@ -53,6 +53,7 @@ env/
 ENV/
 .venv/
 backend/venv/
+frontend/venv/
 
 # Backend database files
 backend/celerydb.db
