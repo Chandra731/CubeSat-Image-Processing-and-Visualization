@@ -35,7 +35,6 @@ The system is composed of four main components:
 - `/frontend` - Frontend web app with templates, static assets, and client-side JavaScript.
 - `/backend` - Backend API server with routes, models, database, and utilities.
 - `/ai_model` - AI model code for image classification.
-- `/data` - (Optional) Data storage for images and satellite data.
 
 ---
 
@@ -91,10 +90,3 @@ The system is composed of four main components:
 - Improve UI/UX and mobile responsiveness.
 - Implement advanced satellite analytics and alerts.
 - Integrate with additional satellite data sources.
-
----
-
-## License and Authors
-
-- License: [Specify License]
-- Authors: [Specify Authors]
