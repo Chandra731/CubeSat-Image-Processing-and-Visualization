@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CubeSat Earth Observation Platform</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      scroll-behavior: smooth;
+      background-color: #0a0f1e;
+      color: #f1f1f1;
+    }
+
+    .hero {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: white;
+    }
+
+    .hero video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      filter: brightness(0.4);
+    }
+
+    .hero .content {
+      z-index: 1;
+    }
+
+    .section-title {
+      font-weight: 700;
+      margin-bottom: 1rem;
+      font-size: 2.5rem;
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      color: #0dcaf0;
+      transition: transform 0.3s ease;
+    }
+
+    .feature-icon:hover {
+      transform: scale(1.2);
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.05);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border-radius: 1rem;
+      padding: 2rem;
+    }
+
+    footer {
+      background-color: #111;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
+  <div class="container">
+    <a class="navbar-brand" href="#">CubeSat Platform</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <a class="navbar-brand" href="#">CubeSat Platform</a>
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto" id="navbar-items">
+        <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+        <li class="nav-item"><a class="nav-link" href="#workflow">Workflow</a></li>
+        <li class="nav-item"><a class="nav-link" href="#dataprocessing">Simulation</a></li>
+        <li class="nav-item" id="login-nav-item"><a class="btn btn-outline-info" href="http://localhost:5000/login">Login</a></li>
+        <li class="nav-item" id="register-nav-item"><a class="btn btn-outline-info ms-2" href="http://localhost:5000/register">Register</a></li>
+        <li class="nav-item d-none" id="user-nav-item">
+          <span class="nav-link" id="username-display"></span>
+        </li>
+        <li class="nav-item d-none" id="logout-nav-item">
+          <button class="btn btn-outline-danger ms-2" id="logout-btn">Logout</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section with Background Video -->
+<header id="home" class="hero">
+  <video autoplay muted loop>
+    <source src="static/images/earth1.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+  <div class="content">
+    <h1 class="display-4 fw-bold" data-aos="fade-up">Explore Earth from Space</h1>
+    <p class="lead" data-aos="fade-up" data-aos-delay="200">
+      Real-time Earth observation using simulated CubeSats, AI & your own drone imagery.
+    </p>
+    <a href="/visualization" class="btn btn-outline-light btn-lg mt-3" data-aos="zoom-in" data-aos-delay="400">
+      Launch Visualization
+    </a>
+  </div>
+</header>
+
+<!-- About -->
+<section id="about" class="py-5 bg-dark">
+  <div class="container glass" data-aos="fade-up">
+    <h2 class="section-title text-center">About the Platform</h2>
+    <p class="text-center lead">
+      Integrated with CesiumJS, Google Earth Engine & AI – explore vegetation indices, satellite history, and your own imagery in one powerful tool.
+      Our platform integrates CubeSat orbit simulation using CesiumJS, Google Earth Engine for real satellite data capture, AI-powered classification models, and a full history management system.
+    </p>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features" class="py-5">
+  <div class="container">
+    <h2 class="section-title text-center" data-aos="fade-up">Key Features</h2>
+    <div class="row text-center mt-4">
+      <div class="col-md-3" data-aos="zoom-in"><i class="bi bi-globe2 feature-icon"></i><p>Interactive 3D Globe</p></div>
+      <div class="col-md-3" data-aos="zoom-in" data-aos-delay="100"><i class="bi bi-cloud-upload feature-icon"></i><p>Upload Your Imagery</p></div>
+      <div class="col-md-3" data-aos="zoom-in" data-aos-delay="200"><i class="bi bi-bar-chart-line feature-icon"></i><p>NDVI, EVI, SAVI</p></div>
+      <div class="col-md-3" data-aos="zoom-in" data-aos-delay="300"><i class="bi bi-cpu-fill feature-icon"></i><p>AI Classification</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Workflow -->
+<section id="workflow" class="py-5 bg-dark text-light">
+  <div class="container">
+    <h2 class="section-title text-center mb-5" data-aos="zoom-in-up">How It Works</h2>
+    <div class="row g-4">
+      <div class="col-md-6" data-aos="fade-right">
+        <div class="card bg-secondary shadow border-0 h-100 rounded-4">
+          <div class="card-body">
+            <h5 class="card-title">Step 1</h5>
+            <p class="card-text">Pick coordinates on the 3D globe.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6" data-aos="fade-left">
+        <div class="card bg-secondary shadow border-0 h-100 rounded-4">
+          <div class="card-body">
+            <h5 class="card-title">Step 2</h5>
+            <p class="card-text">Pull satellite data using GEE.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6" data-aos="fade-right">
+        <div class="card bg-secondary shadow border-0 h-100 rounded-4">
+          <div class="card-body">
+            <h5 class="card-title">Step 3</h5>
+            <p class="card-text">Compute indices like NDVI, SAVI.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6" data-aos="fade-left">
+        <div class="card bg-secondary shadow border-0 h-100 rounded-4">
+          <div class="card-body">
+            <h5 class="card-title">Step 4</h5>
+            <p class="card-text">Run AI classification models.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6" data-aos="fade-right">
+        <div class="card bg-secondary shadow border-0 h-100 rounded-4">
+          <div class="card-body">
+            <h5 class="card-title">Step 5</h5>
+            <p class="card-text">Store, visualize, or download results.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6" data-aos="fade-left">
+        <div class="card bg-secondary shadow border-0 h-100 rounded-4">
+          <div class="card-body">
+            <h5 class="card-title">Step 6</h5>
+            <p class="card-text">Upload your own drone imagery for processing.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Data Simulation -->
+<section id="dataprocessing" class="py-5">
+  <div class="container" data-aos="fade-up">
+    <h2 class="text-center mb-4">🛰️ CubeSat Data Simulation</h2>
+    <p class="text-center mb-5">Mimicking CubeSat onboard operations & ground transmissions.</p>
+    <div class="row text-center">
+      <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+        <i class="bi bi-camera-video-fill fs-2 text-info"></i>
+        <h5 class="mt-2">1. Capture</h5>
+        <p>Via GEE using Cesium satellite coords.</p>
+      </div>
+      <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+        <i class="bi bi-gear-wide-connected fs-2 text-success"></i>
+        <h5 class="mt-2">2. Process</h5>
+        <p>Compute NDVI, SAVI, GCI onboard.</p>
+      </div>
+      <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+        <i class="bi bi-box-arrow-in-down fs-2 text-warning"></i>
+        <h5 class="mt-2">3. Downlink</h5>
+        <p>Queue for transmission to Flask API.</p>
+      </div>
+      <div class="col-md-3" data-aos="fade-up" data-aos-delay="400">
+        <i class="bi bi-diagram-3-fill fs-2 text-danger"></i>
+        <h5 class="mt-2">4. Classify</h5>
+        <p>AI Classifier stores + visualizes result.</p>
+      </div>
+    </div>
+    <div class="text-center mt-4">
+      <a href="/visualization" class="btn btn-outline-info btn-lg">Explore Live Simulation</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-4 text-white text-center">
+  <div class="container">
+    <p class="mb-0">CubeSat Earth Observation &copy; 2025</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init();
+</script>
+<script type="module" src="/static/js/main.js"></script>
+<script type="module">
+  import { checkLoginStatus, logout } from '/static/js/authHandler.js';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const isLoggedIn = await checkLoginStatus();
+    const username = await getUsername();
+
+    const loginNavItem = document.getElementById('login-nav-item');
+    const registerNavItem = document.getElementById('register-nav-item');
+    const userNavItem = document.getElementById('user-nav-item');
+    const logoutNavItem = document.getElementById('logout-nav-item');
+    const usernameDisplay = document.getElementById('username-display');
+
+    if (isLoggedIn) {
+      loginNavItem.classList.add('d-none');
+      registerNavItem.classList.add('d-none');
+      userNavItem.classList.remove('d-none');
+      logoutNavItem.classList.remove('d-none');
+      usernameDisplay.textContent = username || 'User';
+    } else {
+      loginNavItem.classList.remove('d-none');
+      registerNavItem.classList.remove('d-none');
+      userNavItem.classList.add('d-none');
+      logoutNavItem.classList.add('d-none');
+      usernameDisplay.textContent = '';
+    }
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      const success = await logout();
+      if (success) {
+        window.location.href = '/login';
+      }
+    });
+  });
+
+  async function getUsername() {
+    try {
+      const response = await fetch('/api/status', { credentials: 'include' });
+      const data = await response.json();
+      if (data.success && data.user) {
+        return data.user.username;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+</script>
+</body>
+</html>

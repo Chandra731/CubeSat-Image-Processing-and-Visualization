@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CubeSat Visualization</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}"/>
+
+    <!-- Cesium & Chart Libraries -->
+    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.83/Build/Cesium/Widgets/widgets.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/heatmap.js/2.0.5/heatmap.min.js"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="App Logo" style="max-height: 60px;" />
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <a class="navbar-brand" href="#">CubeSat Visualization</a>
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+    <!-- Left: Navigation links -->
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/charts">Charts</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/heatmap">Heatmap</a>
+        </li>
+    </ul>
+
+    <!-- Right: Buttons -->
+    <div class="ml-auto d-flex">
+        <button id="classification-history-btn" class="btn btn-outline-light mr-2">Classification History</button>
+        <button id="image-history-btn" class="btn btn-outline-light mr-2">Image History</button>
+        <button id="logout-btn" class="btn btn-outline-danger">Logout</button>
+    </div>
+</div>
+
+    </nav>
+
+    <div class="container mt-5">
+        <!-- Title & Logo -->
+        <div class="text-center mb-5">
+            <h1 class="mt-3">CubeSat Data Processing & Visualization</h1>
+        </div>
+
+        <!-- Cesium Map -->
+        <div id="cesiumContainer" style="height: 500px;" class="mb-4 border rounded"></div>
+
+        <!-- Lat/Lon Display -->
+        <div id="latLonDisplay" class="text-center mb-4">
+            <p class="lead">Latitude: <strong id="latitude-display">0</strong> | Longitude: <strong id="longitude-display">0</strong></p>
+        </div>
+
+        <!-- Image Capture Form -->
+        <div id="capture-form" class="card mb-5 shadow">
+            <div class="card-body">
+                <h3 class="card-title mb-4">Capture Satellite Image</h3>
+                <form>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="latitude">Latitude</label>
+                            <input type="text" class="form-control" id="latitude" placeholder="Enter latitude" />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="longitude">Longitude</label>
+                            <input type="text" class="form-control" id="longitude" placeholder="Enter longitude" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="datasetSelector">Select Dataset</label>
+                        <select class="form-control" id="datasetSelector">
+                        <option value="COPERNICUS/S2_SR_HARMONIZED">Sentinel-2 (Harmonized) - High resolution multispectral</option>
+                        <option value="LANDSAT/LC08/C02/T1_L2">Landsat 8 - Moderate resolution multispectral</option>
+                        <option value="LANDSAT/LC09/C02/T1_L2">Landsat 9 - Moderate resolution multispectral</option>
+                        <option value="MODIS/006/MOD09GA">MODIS - Daily global coverage</option>
+                        <option value="USDA/NAIP/DOQQ">NAIP - Aerial imagery (drone-like)</option> 
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-block mt-3" id="capture-btn">Capture Image</button>
+                    <button type="button" class="btn btn-secondary btn-block mt-3" id="classify-btn">Classify Image</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="status-bar" class="mb-4">
+            <div class="progress">
+                <div id="status-progress" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+            </div>
+            <p id="status-text" class="text-center mt-2">Select latitude and longitude to start.</p>
+        </div>
+
+        <!-- Image Display -->
+        <div id="image-display" class="mb-5">
+            <h3 class="mb-3 text-center">Captured Images</h3>
+            <div class="row">
+                <div class="col-md-4 text-center mb-3">
+                    <h5>RGB Image</h5>
+                    <img id="rgb-image" src="" class="img-fluid rounded shadow" alt="RGB Image"/>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <h5>NDVI Image</h5>
+                    <img id="ndvi-image" src="" class="img-fluid rounded shadow" alt="NDVI Image"/>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <h5>EVI Image</h5>
+                    <img id="evi-image" src="" class="img-fluid rounded shadow" alt="EVI Image"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 text-center mb-3">
+                    <h5>SAVI Image</h5>
+                    <img id="savi-image" src="" class="img-fluid rounded shadow" alt="SAVI Image"/>
+                </div>
+                <div class="col-md-6 text-center mb-3">
+                    <h5>GCI Image</h5>
+                    <img id="gci-image" src="" class="img-fluid rounded shadow" alt="GCI Image"/>
+                </div>
+            </div>
+        </div>
+
+        <div id="upload-form" class="mb-5">
+            <h3>Upload Your Own Image</h3>
+            <form>
+                <div class="form-group">
+                    <label for="userImageUpload">Select image file</label>
+                    <input type="file" class="form-control-file" id="userImageUpload" accept="image/*" />
+                </div>
+                <button type="button" class="btn btn-primary mt-2" id="upload-btn">Upload & Classify</button>
+            </form>
+            <div class="mt-3">
+                <div id="upload-status-text" class="mb-1"></div>
+                <div class="progress">
+                    <div
+                        id="upload-status-progress"
+                        class="progress-bar"
+                        role="progressbar"
+                        style="width: 0%"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                    ></div>
+                </div>
+            </div>
+        </div>
+        
+
+        <!-- Classification Results -->
+        <div id="classification-results" class="mb-4" style="display:none;">
+            <h3>Classification Results</h3>
+            <ul id="classification-list" class="list-group"></ul>
+        </div>
+        
+        <!-- Image History Modal -->
+        <div class="modal fade" id="image-history-modal" tabindex="-1" aria-labelledby="image-history-modal-label" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Image History</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+        <div class="modal-body">
+            <div class="form-row mb-3">
+                <div class="form-group col-md-6">
+                    <label for="filter-latitude">Filter by Latitude</label>
+                    <input type="text" class="form-control" id="filter-latitude" placeholder="Enter latitude" />
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="filter-longitude">Filter by Longitude</label>
+                    <input type="text" class="form-control" id="filter-longitude" placeholder="Enter longitude" />
+                </div>
+            </div>
+            <div id="image-history-content" class="d-flex flex-wrap gap-3"></div>
+        </div>
+        </div>
+            </div>
+        </div>
+
+        <!-- Classification History Modal -->
+        <div class="modal fade" id="classification-history-modal" tabindex="-1" aria-labelledby="classification-history-modal-label" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Classification History</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+        <div class="modal-body">
+            <div id="classification-history-content" class="d-flex flex-wrap gap-3"></div>
+        </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="mb-5">
+            <h3 class="mb-3">CubeSat Data Chart</h3>
+            <canvas id="cubeSatChart" height="200"></canvas>
+        </div>
+
+        <!-- Heatmap -->
+        <div id="heatmapContainer" class="mb-5 border rounded" style="height: 500px;"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.83/Build/Cesium/Cesium.js"></script>
+
+    <!-- Your Modular Scripts -->
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/apiHandler.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/uiHandler.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/cesiumSetup.js') }}"></script>
+</body>
+</html>

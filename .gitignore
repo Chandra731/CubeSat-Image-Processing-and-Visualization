@@ -1,0 +1,84 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# VSCode settings folder
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Python virtual environments
+venv/
+env/
+ENV/
+.venv/
+backend/venv/
+
+# Backend database files
+backend/celerydb.db
+backend/celerydb.sqlite
+
+# Backend uploads (user uploaded files)
+backend/static/uploads/
+
+# Backend static images (keep, as they seem to be static assets)
+# backend/static/images/  # Not ignored
+
+# AI model files - large model files and dataset
+ai_model/best_model.keras
+ai_model/best_model.tflite
+ai_model/dataset/
+
+# Python cache files in ai_model, backend, frontend
+ai_model/__pycache__/
+backend/__pycache__/
+frontend/__pycache__/
+
+# Python compiled files in ai_model, backend, frontend
+ai_model/*.pyc
+backend/*.pyc
+frontend/*.pyc
+
+# Frontend static source maps (if any)
+frontend/static/css/*.map
+frontend/static/js/*.map

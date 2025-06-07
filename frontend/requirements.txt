@@ -1,0 +1,13 @@
+Flask
+Flask-Cors
+SQLAlchemy
+requests
+celery
+redis
+gunicorn
+google-auth
+earthengine-api
+python-dotenv
+pyorbital
+flask_cors
+sgp4
